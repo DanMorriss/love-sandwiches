@@ -1,5 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
+import json
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -125,12 +126,27 @@ def main():
     data = get_sales_data()
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, "sales")
+    
     new_surplus_data = calculate_surplus_data(sales_data)
     update_worksheet(new_surplus_data, "surplus")
+    
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
     update_worksheet(stock_data, "stock")
+    return stock_data
     
     
 print('Welcome to Love Sandwiches Data Automation')
 main()
+
+def get_stock_values(data):
+    headings = SHEET.worksheet("stock").get_all_values()[0]
+    values = {}
+    i = 0
+    for heading in headings:
+        values[heading] = data[i]
+        i += 1
+    return values
+    
+stock_values = get_stock_values(stock_data)
+print(stock_values)
